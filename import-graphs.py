@@ -21,8 +21,8 @@ FNC_map = FNC_map + 1000
 
 # linearly map values
 for count, label in enumerate(np.unique(FNC_map)):
-	idx = np.where(FNC_map == label)[0]
-	FNC_map[idx] = count
+    idx = np.where(FNC_map == label)[0]
+    FNC_map[idx] = count
 
 # return mappings to original shape
 FNC_map = FNC_map.reshape(dims[0], dims[1])
@@ -31,13 +31,13 @@ FNC_map = FNC_map.reshape(dims[0], dims[1])
 cmat = np.zeros((28, 28, 86))
 for subj in np.arange(86):
     for c in np.arange(378):
-    	
-    	# get index
-    	x = FNC_map[c, 0]
-    	y = FNC_map[c, 1]
+        
+        # get index
+        x = FNC_map[c, 0]
+        y = FNC_map[c, 1]
 
-    	cmat[x, y, subj] = FNC[subj, c]
-    	cmat[y, x, subj] = FNC[subj, c]
+        cmat[x, y, subj] = FNC[subj, c]
+        cmat[y, x, subj] = FNC[subj, c]
 
 # standard deviation
 FNC_var = np.std(FNC, axis=0)

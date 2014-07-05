@@ -32,15 +32,17 @@ for R in [ROI for ROI in np.unique(AAL) if ROI > 0]:
         
         # grab the loadings from component F
         F_data = FNC[idx, F]
+        F_sum = np.sum(F_data)
 
         # loop through structural data
         for S in np.arange(SBM.shape[1]):
 
             # grab the loadings from component S
             S_data = SBM[idx, S]
+            S_sum = np.sum(S_data)
 
-            # subtract sum F from sum S, store.
-            OUT[F, S, R-1] = np.sum(S_data) - np.sum(F_data) 
+            # subtract sum F from sum S, normalized by total sum.
+            OUT[F, S, R-1] = (S_sum - F_sum) / (S_sum + F_sum)  
 
 # plot jam
 for x in np.arange(116):
@@ -50,6 +52,36 @@ for x in np.arange(116):
                              vmin=-1,
                              vmax=1)
     plt.axis('off')
-plt.tight_layout()
 plt.show()
 
+
+MAP = np.zeros((28, 32))
+VAL = np.zeros((28, 32))
+# create mappings per ROI
+for R in [ROI for ROI in np.unique(AAL) if ROI > 0]:
+
+     # find value closest to zero
+    zeroest_value = np.min(np.min(np.abs(OUT[:, :, R-1])))
+    idx = np.where(np.abs(OUT[:, :, R-1]) == zeroest_value)
+
+    # insert the value closest to zero if there isn't anything there
+    if MAP[idx] == 0:
+        MAP[idx] = R
+        VAL[idx] = zeroest_value
+
+    # if there is, overwrite if this value is more zeroer
+    elif VAL[idx] > zeroest_value:
+        print('*** Overwriting ' + str(MAP[idx]) + ' with ' + str(R) + '.')
+        print('--- ' + str(zeroest_value) + ' < ' + str(VAL[idx]) + '.')
+        print(' ')
+        MAP[idx] = R
+        VAL[idx] = zeroest_value
+
+# plot bedlam
+plt.subplot(1,2,1)
+plt.imshow(MAP, cmap=plt.cm.Greys, interpolation='nearest')
+plt.title('ROI assigned')
+plt.subplot(1,2,2)
+plt.imshow(VAL, cmap=plt.cm.Blues, interpolation='nearest')
+plt.colorbar()
+plt.title('Deviations from zero')
