@@ -25,7 +25,17 @@ train.all$Id <- NULL
 
 set.seed(0)
 
-clf = randomForest(Class ~ ., data=train.all)
+clf = randomForest(Class ~ ., data=train.all, ntree=10000)
 subset(as.data.frame(importance(clf)), MeanDecreaseGini < 0.02) # important features
 varImpPlot(clf)
 print(clf)
+
+# predictions for testing data
+test.fnc = read.csv('contest-data/test_FNC.csv')
+test.sbm = read.csv('contest-data/test_SBM.csv')
+test.data = merge(test.fnc, test.sbm)
+
+# predict on dataset (with Id column removed)
+predictions = as.data.frame(predict(clf, test.data[,2:ncol(test.data)], type="prob"))
+submission = data.frame(Id=test.data$Id, Probability = predictions$"1")
+write.csv(submission, file="predictions.csv")
