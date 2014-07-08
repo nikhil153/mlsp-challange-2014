@@ -6,7 +6,7 @@
 % Depends on the Brain Connectivity Toolbox (BCT)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %filename prefix -- train or test
-filetype = 'train';
+filetype = 'test';
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Import Data and Format to a Set of Correlation Matricies
@@ -69,6 +69,9 @@ for subj = 1:n_subj;
     n_rnk = zeros(14, dims(1));
     n_par = zeros(14, dims(1));
     n_div = zeros(14, dims(1));
+
+    % not working yet... need to align CI membership...
+    n_cid = zeros(14, dims(1));
 
     g_smw = zeros(14, 1);
     g_eff = zeros(14, 1);
@@ -150,7 +153,7 @@ for subj = 1:n_subj;
         %
         % graph modularity
         % CALCULATED USING THE LOUVAIN ALGO
-        [Ci, Q] = moduarity_louvain_und_sign(tmp_w);
+        [Ci, Q] = modularity_louvain_und_sign(tmp_w);
         g_mod(x) = Q;
 
         % participation coefficient
@@ -181,7 +184,8 @@ for subj = 1:n_subj;
     g_mod = mean(g_mod);
 
     % generate output array
-    output = [n_deg, n_eff, n_cls, g_smw, g_eff, g_rob];
+    output = [n_deg, n_eff, n_cls, n_rnk, n_par, n_div, ...
+              g_smw, g_eff, g_rob, g_mod];
 
     % append results to the output matrix
     if exist('OUT') == 0;
@@ -191,6 +195,10 @@ for subj = 1:n_subj;
     end
 
 end
+
+% get subject IDs
+IDs = dlmread([ filetype '_FNC.csv'], ',', [1, 0, -1, 0]);
+OUT = [IDs, OUT];
 
 % write the output for all subjects
 dlmwrite([ filetype '_FNC_graph.csv'], OUT, 'delimiter', ',', 'precision', 25);
