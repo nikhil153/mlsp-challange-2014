@@ -46,7 +46,6 @@ print(paste("train error rate = ", train.error))
 #submission  = data.frame(Id=test.data$Id, Probability = predictions$"1")
 #write.csv(submission, file="predictions.csv")
 
-
 # variable importance measures
 varImp = RGLM$timesSelectedByForwardRegression
 

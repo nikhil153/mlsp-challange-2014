@@ -49,5 +49,3 @@ write.csv(submission, file="predictions.csv")
 #	print(gini_threshold)
 #	print(clf)
 #}
-
-
